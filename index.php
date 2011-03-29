@@ -55,7 +55,7 @@
              "created_time > '" + range_begin + "' AND " +
              "created_time <= '" + range_end + "' " +
       "ORDER BY likes.count DESC " +
-      "LIMIT 64";
+      "LIMIT 256";
 
     var posts = FB.Data.query(query, '151383371550838');
     var users = FB.Data.query(
@@ -74,30 +74,47 @@
       });
 
       FB.Array.forEach(posts.value, function(post) {
-        if (post.attachment != undefined && post.attachment.fb_object_type == 'photo') {
+          //console.log(post, (post.message).substr(0, 20), post.likes.count);
+        if (post.attachment != undefined) {
           var actor = user_list[post.actor_id];
           var created = new Date(post.created_time * 1000);
-          var item = "\
-          <li>\
-            <div class='item-like'>\
-              <span class='item-like-count'>" + post.likes.count + "</span>\
-              <img src='" + post.attachment.media[0].src + "'>\
-            </div>\
-            <div class='item-info'>\
-              <div class='item-author'>\
-                by: \
-                <a href='http://facebook.com/profile.php?id=" + actor.uid + "'>" + actor.name + "</a>\
-                when: <em>" + created.format('mmmm dd, yyyy HH:MM') + "</em>\
-              </div>\
-              <div class='item-message'>" + post.message + "</div>\
-              <div class='item-permalink'>link: <a href='" + post.permalink + "'>" + post.permalink + "</a></div>\
-            </div>\
-            <div style='clear:both'></div>\
-          </li>";
+          var picture = "null";
+          if (post.attachment.media != undefined) 
+	  {
+	    try {
+	      picture = post.attachment.media[0].src;
+            }
+            catch (err) {
+	      //console.log(err);
+	    }
+          }
+	  try {
+	    var item = "\
+	    <li>\
+	      <div class='item-like'>\
+					<span class='item-like-count'>" + post.likes.count + "</span>\
+					<img src='" + picture + "'>\
+							</div>\
+							<div class='item-info'>\
+					<div class='item-author'>\
+						by: \
+						<a href='http://facebook.com/profile.php?id=" + actor.uid + "'>" + actor.name + "</a>\
+						when: <em>" + created.format('mmmm dd, yyyy HH:MM') + "</em>\
+					</div>\
+					<div class='item-message'>" + post.message + "</div>\
+					<div class='item-permalink'>link: <a href='" + post.permalink + "'>" + post.permalink + "</a></div>\
+	      </div>\
+	      <div style='clear:both'></div>\
+	    </li>";
 
-          $('#results').append(item);
-          $('#results-count').html($('#results li').size() + " results");
-        }
+	    $('#results').append(item);
+	    $('#results-count').html($('#results li').size() + " results");
+	  }
+    catch (err) {
+      //console.log(err);
+		}
+
+	}
       });
 
       FB.Canvas.setSize();
@@ -107,7 +124,7 @@
   window.fbAsyncInit = function() {
     // Init facebook sdk.
     FB.init({
-      appId  : '110083049063997',
+      appId  : '213496902000002',
       status : false, // check login status
       cookie : true, // enable cookies to allow the server to access the session
       xfbml  : false  // parse XFBML
