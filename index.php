@@ -79,46 +79,49 @@
           var actor = user_list[post.actor_id];
           var created = new Date(post.created_time * 1000);
           var picture = "null";
-          if (post.attachment.media != undefined) 
-	  {
-	    try {
-	      picture = post.attachment.media[0].src;
+          if (post.attachment.media != undefined) {
+            try {
+              picture = post.attachment.media[0].src;
             }
             catch (err) {
-	      //console.log(err);
-	    }
+                if (typeof console != undefined )
+                  console.log(err);
+            }
           }
-	  try {
-	    var item = "\
-	    <li>\
-	      <div class='item-like'>\
-					<span class='item-like-count'>" + post.likes.count + "</span>\
-					<img src='" + picture + "'>\
-							</div>\
-							<div class='item-info'>\
-					<div class='item-author'>\
-						by: \
-						<a href='http://facebook.com/profile.php?id=" + actor.uid + "'>" + actor.name + "</a>\
-						when: <em>" + created.format('mmmm dd, yyyy HH:MM') + "</em>\
-					</div>\
-					<div class='item-message'>" + post.message + "</div>\
-					<div class='item-permalink'>link: <a href='" + post.permalink + "'>" + post.permalink + "</a></div>\
-	      </div>\
-	      <div style='clear:both'></div>\
-	    </li>";
-
-	    $('#results').append(item);
-	    $('#results-count').html($('#results li').size() + " results");
-	  }
-    catch (err) {
-      //console.log(err);
-		}
-
-	}
-      });
-
+          var item = generate_item(picture, post, actor, created);
+          $('#results').append(item);
+          $('#results-count').html($('#results li').size() + " results"); 
+      }
+    }); 
       FB.Canvas.setSize();
-    })
+    });
+  }
+  window.generate_item = function(picture, post, actor, created) {
+    var item;
+    try {
+      item = "\
+      <li>\
+        <div class='item-like'>\
+          <span class='item-like-count'>" + post.likes.count + "</span>\
+          <img src='" + picture + "'>\
+              </div>\
+              <div class='item-info'>\
+          <div class='item-author'>\
+            by: \
+            <a href='http://facebook.com/profile.php?id=" + actor.uid + "'>" + actor.name + "</a>\
+            when: <em>" + created.format('mmmm dd, yyyy HH:MM') + "</em>\
+          </div>\
+          <div class='item-message'>" + post.message + "</div>\
+          <div class='item-permalink'>link: <a href='" + post.permalink + "'>" + post.permalink + "</a></div>\
+        </div>\
+        <div style='clear:both'></div>\
+      </li>";
+    }
+    catch (err) {
+      if (typeof console != undefined)
+        console.log(err);
+    } 
+    return item; 
   }
 
   window.fbAsyncInit = function() {
