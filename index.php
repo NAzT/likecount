@@ -32,21 +32,19 @@
     </ul>
   </div>
   <script>
-  window.today = function() {
-    var d = new Date();
-    return new Date(d.getFullYear(), d.getMonth(), d.getDate());
-  }
-
-  window.tomorrow = function() {
-    return new Date(today().getTime() + 86400000);
-  }
 
   window.get_result = function () {
-    $('#results').html('Please wait, processing ...');
+    $('#results').html('Please wait, processing ...'); 
+    var range_begin = $('#date-begin').datepicker('getDate');
+    var range_end = $('#date-end').datepicker('getDate'); 
+    generate_result(range_begin, range_end); 
+  }
 
-    var range_begin = $('#date-begin').datepicker('getDate').getTime()/1000;
-    var range_end = $('#date-end').datepicker('getDate').getTime()/1000;
-
+  window.generate_result = function(range_begin, range_end) { 
+    if (typeof console != undefined) 
+      console.log('start: ', range_begin, 'end: ', range_end);
+    range_begin = range_begin.getTime() / 10000;
+    range_end = range_end.getTime() / 10000;
     var query =
       "SELECT post_id, attachment, likes, created_time, actor_id, message, permalink " +
       "FROM stream " +
@@ -62,9 +60,7 @@
        "SELECT uid, name " +
        "FROM user " +
        "WHERE uid in " +
-       "(SELECT actor_id from {0})", posts);
-
-
+       "(SELECT actor_id from {0})", posts); 
     FB.Data.waitOn([posts, users], function() {
       $('#results').html('');
       var user_list = {};
@@ -91,11 +87,12 @@
           var item = generate_item(picture, post, actor, created);
           $('#results').append(item);
           $('#results-count').html($('#results li').size() + " results"); 
-      }
-    }); 
+        }
+      }); 
       FB.Canvas.setSize();
-    });
+    }); 
   }
+
   window.generate_item = function(picture, post, actor, created) {
     var item;
     try {
@@ -124,6 +121,23 @@
     return item; 
   }
 
+  window.today = function() {
+    var d = new Date();
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  }
+ 
+  window.midnight = function() {
+    return new Date(today().getTime() + 86400000);
+  }
+
+  window.now = function() {
+    return new Date();
+  }
+
+  window.ndaysago = function(n) {
+    return new Date(today().getTime() - n*86400000);
+  }
+
   window.fbAsyncInit = function() {
     // Init facebook sdk.
     FB.init({
@@ -150,7 +164,7 @@
     });
 
     $('#date-begin').datepicker('setDate', today());
-    $('#date-end').datepicker('setDate', tomorrow());
+    $('#date-end').datepicker('setDate', midnight());
 
     $('#get-result').click(function (e) {
       get_result();
