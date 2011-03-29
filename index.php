@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Count most like on picture post to gonorththailand.
+ * Count most like on page 
  */
 
 ?>
@@ -10,7 +10,7 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>GoNorth Like Count</title>
+    <title>Like Count</title>
     <link rel="stylesheet" href="css/redmond/jquery-ui-1.8.7.custom.css">
     <link rel="stylesheet" href="css/like-count.css">
     <script src="js/jquery-1.4.4.min.js"></script>
@@ -20,7 +20,7 @@
 
   <body>
   <div id="fb-root"></div>
-  <h1>GoNorth Like Count</h1>
+  <h1>Like Count</h1>
   <div id="like-count">
     <div id="date-control">
       from: <input type="text" id="date-begin">
@@ -34,17 +34,14 @@
   <script>
 
   window.get_result = function () {
-    $('#results').html('Please wait, processing ...'); 
-    var range_begin = $('#date-begin').datepicker('getDate');
-    var range_end = $('#date-end').datepicker('getDate'); 
+    $('#results').html('Please wait, processing ...');
+
+    var range_begin = $('#date-begin').datepicker('getDate').getTime()/1000;
+    var range_end = $('#date-end').datepicker('getDate').getTime()/1000; 
     generate_result(range_begin, range_end); 
   }
 
   window.generate_result = function(range_begin, range_end) { 
-    if (typeof console != undefined) 
-      console.log('start: ', range_begin, 'end: ', range_end);
-    range_begin = range_begin.getTime() / 10000;
-    range_end = range_end.getTime() / 10000;
     var query =
       "SELECT post_id, attachment, likes, created_time, actor_id, message, permalink " +
       "FROM stream " +
@@ -163,7 +160,7 @@
       dateFormat: "dd/mm/yy"
     });
 
-    $('#date-begin').datepicker('setDate', today());
+    $('#date-begin').datepicker('setDate', ndaysago(7));
     $('#date-end').datepicker('setDate', midnight());
 
     $('#get-result').click(function (e) {
@@ -173,3 +170,4 @@
   </script>
   </body>
 </html>
+
